@@ -1,8 +1,9 @@
 export function Footer(){
     return (
-        <div className="footer-section">
-            <p>About us <br />Fasika farmers connects strives to help farmers in rular areas get real time weather data and advisory.</p>
-            <p>@copyright 2026</p>
-        </div>
+       <footer>
+            <p> Fasika Farmers Connect helps farmers in rural areas access weather data,
+        market prices, and agricultural advisory services.</p>
+            <p>©  2026 Fasika Farmers Connect</p>
+        </footer>
     )
 }
