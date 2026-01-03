@@ -12,9 +12,9 @@ import Cookies from "../pages/legal/Cookies";
 import Privacy from "../pages/legal/PrivacyPolicy";
 import Terms from "../pages/legal/TermsOfService";
 
-export default function AppRouter(){
+export default function AppRoutes(){
     return(
-        <BrowserRouter>
+        
         <Routes> 
             <Route path="/" element={<Home />} ></Route>
             <Route path="/market" element={<Market />} ></Route>
@@ -30,7 +30,6 @@ export default function AppRouter(){
             <Route path="/terms" element={<Terms />} ></Route>
 
         </Routes>
-        
-        </BrowserRouter>
+    
     )
 }

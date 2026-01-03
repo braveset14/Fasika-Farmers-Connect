@@ -1,3 +1,3 @@
 export default function Advisory() {
-  return <h1>Fasika Farmers Connect Market Advisory</h1>;
+  return <h1>Fasika Farmers Connect  Advisory</h1>;
 }
