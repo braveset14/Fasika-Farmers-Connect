@@ -1,5 +1,5 @@
 export function PageWrapper ({children}){
     return (
-        <main> {children}</main>
+        <main className="page-wrapper"> {children}</main>
     )
 }

@@ -1,16 +1,20 @@
+import useFetch from "../hooks/useFetch";
+import { getMarketData } from "../api/services/market.service";
+import FarmerProductListing from "../components/market/FarmerProductListing";
+
 export default function Market() {
-  const marketData=[
-    { crop: "Maize", price: "2,500 ETB / quintal", location: "Oromia" },
-    { crop: "Teff", price: "6,800 ETB / quintal", location: "Amhara" },
-    { crop: "Wheat", price: "4,200 ETB / quintal", location: "Tigray" },
-    { crop: "Barley", price: "3,900 ETB / quintal", location: "SNNPR" },
-  ]
+  const { data, loading, error } = useFetch(getMarketData);
+
+  const fallbackData = [
+    { crop: "Maize", price: "2,500 ETB / quintal", region: "Oromia" },
+    { crop: "Teff", price: "6,800 ETB / quintal", region: "Amhara" },
+  ];
+
+  const marketData = data || fallbackData;
+
   return (
     <div className="market">
-      <h1 className="market-title">Market Prices</h1>
-      <p className="market-description">
-        Browse current agricultural market prices from different regions.
-      </p>
+      <h1>Market Prices</h1>
 
       <table className="market-table">
         <thead>
@@ -21,15 +25,17 @@ export default function Market() {
           </tr>
         </thead>
         <tbody>
-          {marketData.map((item, index) => (
-            <tr key={index}>
+          {marketData.map((item, i) => (
+            <tr key={i}>
               <td>{item.crop}</td>
               <td>{item.price}</td>
-              <td>{item.location}</td>
+              <td>{item.region}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+   
     </div>
-  )
+  );
 }

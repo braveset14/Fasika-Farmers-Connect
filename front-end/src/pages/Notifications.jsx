@@ -1,3 +1,24 @@
+import { useNotifications } from "../hooks/useNotifications";
+
 export default function Notifications() {
-  return <h1>Fasika Farmers Connect  Notifications</h1>;
+  const { notifications, markAsRead } = useNotifications();
+
+  return (
+    <div className="notifications">
+      <h2>Notifications</h2>
+
+      <ul className="notification-list">
+        {notifications.map(n => (
+          <li
+            key={n.id}
+            className={`notification ${n.type}`}
+            onClick={() => markAsRead(n.id)}
+          >
+            {n.message}
+            {!n.read && <strong> (new)</strong>}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
