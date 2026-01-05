@@ -11,7 +11,7 @@ import Team from "../pages/static/Team";
 import Cookies from "../pages/legal/Cookies";
 import Privacy from "../pages/legal/PrivacyPolicy";
 import Terms from "../pages/legal/TermsOfService";
-import FarmerProductListing from "../components/market/FarmerProductListing";
+
 
 export default function AppRoutes(){
     return(
@@ -19,7 +19,6 @@ export default function AppRoutes(){
         <Routes> 
             <Route path="/" element={<Home />} ></Route>
             <Route path="/market" element={<Market />} ></Route>
-            <Route path="/market/sell" element={<FarmerProductListing />} />
             <Route path="/advisory" element={<Advisory />} ></Route>
             <Route path="/help" element={<Help />} ></Route>
             <Route path="/notifications" element={<Notifications />} ></Route>
