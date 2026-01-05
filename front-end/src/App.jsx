@@ -1,61 +1,53 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
+import Sidebar from './components/Sidebar'
 
-// 1. Import your UI Pages
-import Landing from './pages/auth/Landing';
-import LoginForm from './pages/auth/LoginForm';
-import RegisterForm from './pages/auth/RegisterForm';
-import VerifyEmail from './pages/auth/VerifyEmail';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
-
-// 2. Import your Security Routes
-import ProtectedRoute from './routes/ProtectedRoute';
-import RoleRoute from './routes/RoleRoute';
+// Page Imports
+import RegistrationForm from './pages/auth/RegistrationForm'
+import VerificationPage from './pages/auth/VerificationPage'
+import LoginPage from './pages/auth/LoginPage'
+import ForgotPassword from './pages/auth/ForgotPassword'
+import ResetPassword from './pages/auth/ResetPassword'
+import ChangePassword from './pages/auth/ChangePassword'
+import MFASetup from './pages/auth/MFASetup'
+import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
+  const { user } = useAuth();
+
   return (
-    <Router>
-      <Routes>
-        {/* --- PUBLIC AUTH ROUTES (Anyone can see these) --- */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+    <div className="flex h-screen w-full bg-gray-50">
+      {/* 8️⃣ Sidebar & Logout: Only show when logged in [cite: 110, 112] */}
+      {user && <Sidebar />}
 
-        {/* --- PROTECTED ROUTES (Must be logged in) --- */}
-        <Route 
-          path="/dashboard" 
-          element={
-            <ProtectedRoute>
-              <div style={{ padding: '20px' }}>
-                <h1>Common Dashboard</h1>
-                <p>Visible to any logged-in user.</p>
-              </div>
-            </ProtectedRoute>
-          } 
-        />
+      <div className="flex-1 overflow-y-auto">
+        <Routes>
+          {/* 1️⃣ Registration Page [cite: 2] */}
+          <Route path="/register" element={<RegistrationForm />} />
 
-        {/* --- ROLE-BASED ROUTES (Farmer Only) --- */}
-        <Route 
-          path="/farmer-portal" 
-          role="farmer"
-          element={
-            <RoleRoute allowedRoles={['farmer']}>
-              <div style={{ padding: '20px' }}>
-                <h1>Farmer Portal</h1>
-                <p>Only Farmers can see this.</p>
-              </div>
-            </RoleRoute>
-          } 
-        />
+          {/* 2️⃣ Verification Page (OTP) [cite: 32] */}
+          <Route path="/verify" element={<VerificationPage />} />
 
-        {/* --- ERROR PAGE --- */}
-        <Route path="/unauthorized" element={<h1>Access Denied: You don't have the right role.</h1>} />
-      </Routes>
-    </Router>
-  );
+          {/* 3️⃣ Login Page [cite: 44] */}
+          <Route path="/login" element={<LoginPage />} />
+
+          {/* 4️⃣ & 5️⃣ Forgot/Reset Password [cite: 67, 77] */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* 6️⃣ & 7️⃣ Change Password & MFA [cite: 89, 100] */}
+          <Route path="/settings/password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+          <Route path="/settings/mfa" element={<ProtectedRoute><MFASetup /></ProtectedRoute>} />
+
+          {/* Main Dashboard (Protected) */}
+          <Route path="/dashboard" element={<ProtectedRoute><div>Farmer Dashboard</div></ProtectedRoute>} />
+
+          {/* Redirect to login by default */}
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes>
+      </div>
+    </div>
+  )
 }
 
-export default App;
+export default App

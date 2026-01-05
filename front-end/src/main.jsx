@@ -1,15 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext'
-import { NetworkProvider } from './context/NetworkContext'
+import './index.css'
+
+// Register Service Worker for Offline/PWA functionality
+import { registerSW } from 'virtual:pwa-register'
+registerSW({ immediate: true })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <NetworkProvider>
+    <BrowserRouter>
       <AuthProvider>
         <App />
       </AuthProvider>
-    </NetworkProvider>
+    </BrowserRouter>
   </React.StrictMode>,
 )
