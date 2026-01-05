@@ -1,53 +1,60 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import Sidebar from './components/Sidebar'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 
-// Page Imports
-import RegistrationForm from './pages/auth/RegistrationForm'
-import VerificationPage from './pages/auth/VerificationPage'
-import LoginPage from './pages/auth/LoginPage'
-import ForgotPassword from './pages/auth/ForgotPassword'
-import ResetPassword from './pages/auth/ResetPassword'
-import ChangePassword from './pages/auth/ChangePassword'
-import MFASetup from './pages/auth/MFASetup'
-import ProtectedRoute from './routes/ProtectedRoute'
+// Import all 8 Stages
+import RegistrationForm from './pages/auth/RegistrationForm'; // Stage 1
+import VerificationPage from './pages/auth/VerificationPage';   // Stage 2
+import LoginPage from './pages/auth/LoginPage';               // Stage 3
+import ForgotPassword from './pages/auth/ForgotPassword';     // Stage 4
+import ResetPassword from './pages/auth/ResetPassword';       // Stage 5
+import ChangePassword from './pages/auth/ChangePassword';     // Stage 6
+import MFASetup from './pages/auth/MFASetup';                 // Stage 7
+
+// Note: Sidebar is imported here (Teammate's work)
+// import Sidebar from './components/Sidebar'; 
 
 function App() {
-  const { user } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
 
   return (
-    <div className="flex h-screen w-full bg-gray-50">
-      {/* 8️⃣ Sidebar & Logout: Only show when logged in [cite: 110, 112] */}
-      {user && <Sidebar />}
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Show Sidebar only if user is logged in */}
+      {/* isAuthenticated && <Sidebar /> */}
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1">
         <Routes>
-          {/* 1️⃣ Registration Page [cite: 2] */}
+          {/* Public Routes */}
           <Route path="/register" element={<RegistrationForm />} />
-
-          {/* 2️⃣ Verification Page (OTP) [cite: 32] */}
           <Route path="/verify" element={<VerificationPage />} />
-
-          {/* 3️⃣ Login Page [cite: 44] */}
           <Route path="/login" element={<LoginPage />} />
-
-          {/* 4️⃣ & 5️⃣ Forgot/Reset Password [cite: 67, 77] */}
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* Protected Private Routes */}
+          <Route 
+            path="/dashboard" 
+            element={isAuthenticated ? <div className="p-10"><h1>Welcome to Dashboard</h1></div> : <Navigate to="/login" />} 
+          />
+          
+          <Route 
+            path="/settings/password" 
+            element={isAuthenticated ? <ChangePassword /> : <Navigate to="/login" />} 
+          />
+          
+          <Route 
+            path="/settings/mfa" 
+            element={isAuthenticated ? <MFASetup /> : <Navigate to="/login" />} 
+          />
 
-          {/* 6️⃣ & 7️⃣ Change Password & MFA [cite: 89, 100] */}
-          <Route path="/settings/password" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
-          <Route path="/settings/mfa" element={<ProtectedRoute><MFASetup /></ProtectedRoute>} />
-
-          {/* Main Dashboard (Protected) */}
-          <Route path="/dashboard" element={<ProtectedRoute><div>Farmer Dashboard</div></ProtectedRoute>} />
-
-          {/* Redirect to login by default */}
-          <Route path="/" element={<Navigate to="/login" />} />
+          {/* Default Redirects */}
+          <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+          <Route path="*" element={<div className="p-10">404 - Page Not Found</div>} />
         </Routes>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

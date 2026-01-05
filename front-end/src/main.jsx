@@ -1,13 +1,13 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import App from './App.jsx'
-import { AuthProvider } from './context/AuthContext'
-import './index.css'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App.jsx';
+import { AuthProvider } from './context/AuthContext';
+import './index.css';
+import { registerSW } from 'virtual:pwa-register';
 
-// Register Service Worker for Offline/PWA functionality
-import { registerSW } from 'virtual:pwa-register'
-registerSW({ immediate: true })
+// Register the Service Worker for Offline/PWA support
+registerSW({ immediate: true });
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,5 +16,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <App />
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>,
-)
+  </React.StrictMode>
+);

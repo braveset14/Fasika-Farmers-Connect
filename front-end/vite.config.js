@@ -7,9 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({ 
       registerType: 'autoUpdate',
-      devOptions: {
-        enabled: true // This allows the PWA to work while you are developing
-      }
+      devOptions: { enabled: true }
     })
   ]
 })

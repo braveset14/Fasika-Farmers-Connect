@@ -1,34 +1,36 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const VerificationPage = () => {
-  const [otp, setOtp] = useState(new Array(6).fill("")); // [cite: 35]
+  const [otp, setOtp] = useState(new Array(6).fill(""));
+  const navigate = useNavigate();
 
   const handleVerify = async () => {
-    // API Call: POST /api/auth/verify-user [cite: 37]
-    const response = await fetch('/api/auth/verify-user', {
+    const res = await fetch('/api/auth/verify-user', {
       method: 'POST',
-      body: JSON.stringify({ code: otp.join("") })
+      body: JSON.stringify({ otp: otp.join("") })
     });
-    if (response.ok) window.location.href = '/login'; // [cite: 38]
+    if (res.ok) navigate('/login');
   };
 
   return (
-    <div className="text-center p-10">
-      <h2 className="text-xl font-bold mb-4">2️⃣ Verification</h2>
-      <p>Enter the 6-digit code sent to your device.</p>
-      <div className="flex justify-center gap-2 my-4">
+    <div className="otp-container">
+      <h2>2️⃣ Verification</h2>
+      <div className="otp-inputs">
         {otp.map((data, index) => (
-          <input key={index} type="text" maxLength="1" className="w-10 h-12 border text-center text-xl" 
+          <input key={index} type="text" maxLength="1" 
             onChange={e => {
               let newOtp = [...otp];
               newOtp[index] = e.target.value;
               setOtp(newOtp);
+              if (e.target.value && e.target.nextSibling) e.target.nextSibling.focus();
             }} 
           />
         ))}
       </div>
-      <button onClick={handleVerify} className="bg-blue-600 text-white px-6 py-2 rounded">Verify</button>
+      <button onClick={handleVerify}>Verify Account</button>
     </div>
   );
 };
+
 export default VerificationPage;
