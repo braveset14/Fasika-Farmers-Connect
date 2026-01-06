@@ -1,6 +1,6 @@
 import useFetch from "../hooks/useFetch";
 import { getMarketData } from "../api/services/market.service";
-import FarmerProductListing from "../components/market/FarmerProductListing";
+
 
 export default function Market() {
   const { data, loading, error } = useFetch(getMarketData);
