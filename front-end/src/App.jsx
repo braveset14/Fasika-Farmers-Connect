@@ -1,3 +1,4 @@
+
 import { BrowserRouter } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -7,11 +8,11 @@ import Sidebar from './components/layout/Sidebar';
 import { Footer } from './components/layout/Footer';
 import { PageWrapper } from './components/layout/PageWrapper';
 
-function App() {
+export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <BrowserRouter>
+    
       <div className="app-layout">
         {/* Sidebar */}
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -19,7 +20,7 @@ function App() {
         <div className="main-area">
           {/* Navbar */}
           <NavBar onMenuClick={() => setSidebarOpen(true)} />
-            <div className="pageWrapper">
+          <div className="pageWrapper">
           <PageWrapper >
             <AppRoutes />
           </PageWrapper>
@@ -27,8 +28,5 @@ function App() {
           <Footer />
         </div>
       </div>
-    </BrowserRouter>
-  );
-}
-
-export default App;
+    
+)}
