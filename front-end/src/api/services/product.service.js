@@ -1,5 +1,4 @@
-// Product Business Service
-// Uses mock data as backend is not ready
+
 
 export const productService = {
     getProducts: async () => {

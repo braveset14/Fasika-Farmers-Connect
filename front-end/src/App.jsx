@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-
+import {  Routes, Route, Navigate,Router } from 'react-router-dom';
+import ProtectedRoute from './routes/ProtectedRoute';
+import RoleRoute from './routes/RoleRoute';
 // 1. Import Auth Pages (Member 1)
 import Landing from './pages/auth/Landing';
 import LoginForm from './pages/auth/LoginForm';
@@ -64,56 +65,272 @@ const BuyerLayout = ({ children }) => (
   </div>
 );
 
-const TestSelector = () => (
-  <div className="p-20 text-center bg-gray-50 min-h-screen">
-    <h1 className="text-4xl font-black mb-10">Fasika Testing Hub (Member 2)</h1>
-    <div className="flex justify-center gap-8">
-      <Link to="/admin/dashboard" className="bg-green-800 text-white px-8 py-4 rounded-2xl font-bold shadow-xl">Admin Portal</Link>
-      <Link to="/farmer/dashboard" className="bg-green-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl">Farmer Portal</Link>
-      <Link to="/buyer/dashboard" className="bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl">Buyer Market</Link>
-    </div>
-    <p className="mt-10 text-gray-400 font-medium italic">Bypassing auth for prototype testing.</p>
-  </div>
-);
+
 
 function App() {
   return (
-    <Router>
+   
       <Routes>
-        {/* --- TESTING ROOT --- */}
-        <Route path="/" element={<TestSelector />} />
+        
 
         {/* --- ADMIN ROUTES --- */}
-        <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-        <Route path="/admin/management" element={<AdminLayout><Management /></AdminLayout>} />
-        <Route path="/admin/product" element={<AdminLayout><ProductManagement /></AdminLayout>} />
-        <Route path="/admin/product/prices" element={<AdminLayout><PriceManagement /></AdminLayout>} />
-        <Route path="/admin/product/approvals" element={<AdminLayout><PostManagement /></AdminLayout>} />
-        <Route path="/admin/product/detail/:id" element={<AdminLayout><ProductDetail /></AdminLayout>} />
-        <Route path="/admin/product/analytics" element={<AdminLayout><ProductAnalytics /></AdminLayout>} />
-        <Route path="/admin/product/reports" element={<AdminLayout><ProductReports /></AdminLayout>} />
-        <Route path="/admin/product/ratings" element={<AdminLayout><ProductRatings /></AdminLayout>} />
-        <Route path="/admin/user" element={<AdminLayout><FarmerManagement /></AdminLayout>} />
-        <Route path="/admin/user/buyers" element={<AdminLayout><BuyerManagement /></AdminLayout>} />
-        <Route path="/admin/user/detail/:id" element={<AdminLayout><UserDetail /></AdminLayout>} />
-        <Route path="/admin/user/suspend/:id" element={<AdminLayout><SuspendUser /></AdminLayout>} />
-        <Route path="/admin/user/reports" element={<AdminLayout><UserReports /></AdminLayout>} />
-        <Route path="/admin/weather" element={<AdminLayout><WeatherManagement /></AdminLayout>} />
-        <Route path="/admin/weather/reports" element={<AdminLayout><WeatherRepoets /></AdminLayout>} />
-        <Route path="/admin/tips" element={<AdminLayout><TipsManagement /></AdminLayout>} />
-        <Route path="/admin/tips/reports" element={<AdminLayout><TipsReports /></AdminLayout>} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <AdminDashboard/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/management" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <Management/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <ProductManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/prices" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <PriceManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/approvals" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <PostManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/detail/:id" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <ProductDetail/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/analytics" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <ProductAnalytics/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/reports" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <ProductReports/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/product/ratings" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <ProductRatings/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/user" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <FarmerManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/user/buyers" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <BuyerManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/user/detail/:id" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <UserDetail/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/user/suspend/:id" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <SuspendUser/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/user/reports" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <UserReports/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/weather" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <WeatherManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/weather/reports" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <WeatherRepoets/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/tips" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <TipsManagement/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
+        <Route path="/admin/tips/reports" element={
+          <ProtectedRoute>
+            <RoleRoute allowedRoles={["admin"]}>
+              <AdminLayout>
+                <TipsReports/>
+              </AdminLayout>
+            </RoleRoute>
+          </ProtectedRoute>
+          
+          } />
 
         {/* --- FARMER ROUTES --- */}
-        <Route path="/farmer/dashboard" element={<FarmerLayout><FarmerDashboard /></FarmerLayout>} />
-        <Route path="/farmer/product" element={<FarmerLayout><FarmerViewProduct /></FarmerLayout>} />
-        <Route path="/farmer/product/post" element={<FarmerLayout><PostProduct /></FarmerLayout>} />
-        <Route path="/farmer/product/update/:id" element={<FarmerLayout><UpdateProduct /></FarmerLayout>} />
-        <Route path="/farmer/weather" element={<FarmerLayout><FarmerWeather /></FarmerLayout>} />
+        <Route path="/farmer/dashboard" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={["farmer"]}>
+                <FarmerLayout>
+                  <FarmerDashboard />
+                </FarmerLayout>
+              </RoleRoute>
+            </ProtectedRoute>
+          }/>
+        <Route path="/farmer/product" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={["farmer"]}>
+                <FarmerLayout>
+                  <FarmerViewProduct/>
+                </FarmerLayout>
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+        <Route path="/farmer/product/post" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={["farmer"]}>
+                <FarmerLayout>
+                  <PostProduct />
+                </FarmerLayout>
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+        <Route path="/farmer/product/update/:id" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={["farmer"]}>
+                <FarmerLayout>
+                  <UpdateProduct />
+                </FarmerLayout>
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+        <Route path="/farmer/weather" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={["farmer"]}>
+                <FarmerLayout>
+                  <FarmerWeather />
+                </FarmerLayout>
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
 
         {/* --- BUYER ROUTES --- */}
-        <Route path="/buyer/dashboard" element={<BuyerLayout><BuyerDashboard /></BuyerLayout>} />
-        <Route path="/buyer/product" element={<BuyerLayout><BuyerViewProduct /></BuyerLayout>} />
-        <Route path="/buyer/weather" element={<BuyerLayout><BuyerWeather /></BuyerLayout>} />
+        <Route path="/buyer/dashboard" element={
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={["buyer"]}>
+        <BuyerLayout>
+          <BuyerDashboard />
+        </BuyerLayout>
+      </RoleRoute>
+    </ProtectedRoute>
+  } />
+        <Route path="/buyer/product" element={
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={["buyer"]}>
+        <BuyerLayout>
+          <BuyerViewProduct />
+        </BuyerLayout>
+      </RoleRoute>
+    </ProtectedRoute>
+  } />
+        <Route path="/buyer/weather" element={
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={["buyer"]}>
+        <BuyerLayout>
+          <BuyerWeather />
+        </BuyerLayout>
+      </RoleRoute>
+    </ProtectedRoute>
+  }/>
 
         {/* --- ORIGINAL AUTH ROUTES (Hidden for testing root) --- */}
         <Route path="/landing" element={<Landing />} />
@@ -125,8 +342,43 @@ function App() {
 
         {/* --- ERROR PAGE --- */}
         <Route path="/unauthorized" element={<h1>Access Denied</h1>} />
+
+        <Route path="/dev-login" element={
+  <div style={{ padding: 40 }}>
+    <button onClick={() => {
+      localStorage.setItem('auth', JSON.stringify({
+        isAuthenticated: true,
+        user: { role: 'admin' }
+      }));
+      window.location.href = '/admin/dashboard';
+    }}>
+      Login as Admin
+    </button>
+
+    <button onClick={() => {
+      localStorage.setItem('auth', JSON.stringify({
+        isAuthenticated: true,
+        user: { role: 'farmer' }
+      }));
+      window.location.href = '/farmer/dashboard';
+    }}>
+      Login as Farmer
+    </button>
+
+    <button onClick={() => {
+      localStorage.setItem('auth', JSON.stringify({
+        isAuthenticated: true,
+        user: { role: 'buyer' }
+      }));
+      window.location.href = '/buyer/dashboard';
+    }}>
+      Login as Buyer
+    </button>
+  </div>
+} />
+
       </Routes>
-    </Router>
+    
   );
 }
 

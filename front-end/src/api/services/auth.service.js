@@ -1,20 +1,24 @@
-const API_URL = "https://your-api.com/api/auth";
+
 
 export const authService = {
-  login: async (credentials) => {
-    const res = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
-    return res.json();
+  login: async ({ email, password }) => {
+    // TEMP: fake users for integration testing
+    if (email === "admin@test.com") {
+      return { user: { name: "Admin", role: "admin" }, token: "admin-token" };
+    }
+
+    if (email === "farmer@test.com") {
+      return { user: { name: "Farmer", role: "farmer" }, token: "farmer-token" };
+    }
+
+    if (email === "buyer@test.com") {
+      return { user: { name: "Buyer", role: "buyer" }, token: "buyer-token" };
+    }
+
+    throw new Error("Invalid credentials");
   },
-  register: async (data) => {
-    const res = await fetch(`${API_URL}/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    return res.json();
+
+  logout: async () => {
+    return true;
   }
 };

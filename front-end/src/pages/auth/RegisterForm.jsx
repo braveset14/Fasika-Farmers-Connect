@@ -6,7 +6,7 @@ const RegisterForm = () => {
   const [role, setRole] = useState('farmer');
 
   return (
-    <form className="auth-form" onSubmit={(e) => { e.preventDefault(); navigate('/verify-email'); }}>
+    <form className="auth-form" onSubmit={(e) => { e.preventDefault(); localStorage.setItem("pendingRole", role); navigate('/verify-email'); }}>
       <h2>Create Account</h2>
       <input type="text" placeholder="Full Name" required />
       <input type="email" placeholder="Email" required />
