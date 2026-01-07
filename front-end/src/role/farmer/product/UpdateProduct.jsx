@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
-
+import React, { useLayoutEffect, useState } from 'react';
+import { useNavigate,useLocation } from 'react-router-dom';
 const UpdateProduct = () => {
-    // Mocking pre-filled data for "Premium Teff"
-    const [formData, setFormData] = useState({
-        name: 'Premium Teff',
-        category: 'Grains',
-        price: '2500',
-        quantity: '50',
-        description: 'High quality white teff from Ada\'a region. Cleaned and ready.'
-    });
+    const navigate=useNavigate();
+    const location=useLocation();
+    const [formData, setFormData] = useState({...location.state?.product || {}});
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        alert("Changes saved successfully!");
+        navigate('/farmer/product',{
+            state:{updatedProduct: formData}
+        });
+       
     };
 
     return (
         <div className="p-8 max-w-2xl">
             <div className="flex items-center gap-4 mb-8">
-                <button className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">←</button>
+                <button onClick={()=>navigate(-1)} className="w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">←</button>
                 <h2 className="text-3xl font-black text-gray-900">Update Listing</h2>
             </div>
 

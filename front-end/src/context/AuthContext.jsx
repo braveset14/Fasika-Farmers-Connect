@@ -1,9 +1,7 @@
-
 import { useNavigate } from "react-router-dom";
-import { createContext,useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext(null);
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -30,3 +28,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

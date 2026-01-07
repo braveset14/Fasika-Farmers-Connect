@@ -1,47 +1,75 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import adminMenu from '../../menu/adminMenu';
 
 const AdminNavbar = () => {
-    const navigate = useNavigate();
+    const [showProfile, setShowProfile] = useState(false);
 
     const handleLogout = () => {
-        // Member 2 is NOT responsible for auth logic, just the trigger
-        console.log("Logout triggered from Admin Navbar");
-        // navigate('/login'); // Mock navigation
-        window.location.href = '/login'; // Force redirect for now
+        console.log("Admin Logout triggered");
+        window.location.href = '/login';
     };
 
     return (
-        <nav className="bg-green-900 text-white w-64 min-h-screen p-6 flex flex-col">
-            <div className="mb-10 text-2xl font-bold tracking-tight text-yellow-400">
-                FASIKA <span className="text-white">Admin</span>
-            </div>
+        <nav className="navbar">
+            {/* MENU BUTTON */}
+            <button className="menu-btn">
+                ☰
+            </button>
 
-            <div className="flex-grow space-y-2">
-                {adminMenu.map((item) => (
+            {/* Branding */}
+            <h2 className="navbar-logo">Fasika Admin</h2>
+
+            {/* GLOBAL SEARCH */}
+            <input
+                className="global-search"
+                placeholder="Search crops, prices, advisory..."
+            />
+
+            {/* LOCATION SELECTOR */}
+            <select className="location-selector">
+                <option>Amhara</option>
+                <option>Amhara</option>
+                <option>Tigray</option>
+                <option>SNNPR</option>
+            </select>
+
+            {/* Role-specific links */}
+            <div className="navbar-actions">
+                {adminMenu.map(item => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         className={({ isActive }) =>
-                            `block py-3 px-4 rounded-lg transition-all ${isActive
-                                ? 'bg-yellow-500 text-green-950 font-semibold shadow-inner'
-                                : 'hover:bg-green-800 text-green-100'
-                            }`
+                            `myLinks ${isActive ? 'active' : ''}`
                         }
                     >
                         {item.label}
                     </NavLink>
                 ))}
-            </div>
 
-            <div className="pt-6 border-t border-green-800">
-                <button
-                    onClick={handleLogout}
-                    className="w-full text-left py-3 px-4 rounded-lg text-red-300 hover:bg-red-900/30 hover:text-red-100 transition-colors flex items-center gap-2"
-                >
-                    <span>🚪</span> Logout
+                {/* NOTIFICATION BELL */}
+                <Link to="/notifications" className="icon-btn">
+                    🔔
+                </Link>
+
+                {/* PROFILE */}
+                <button className="icon-btn" onClick={() => setShowProfile(!showProfile)}>
+                    👤
                 </button>
+
+                {showProfile && (
+                    <div className="dropdown">
+                        <div className="myLinks">
+                            <Link to="/profile">Account Info</Link>
+                            <Link to="/preferences">Preferences</Link>
+                            <button onClick={handleLogout}>Logout</button>
+                        </div>
+                    </div>
+                )}
+
+                {/* LOGOUT BUTTON */}
+                <button className="icon-btn" onClick={handleLogout}>🚪</button>
             </div>
         </nav>
     );

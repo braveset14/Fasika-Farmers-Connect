@@ -57,28 +57,11 @@ import FarmerWeather from '../role/farmer/weather/Weather';
 import BuyerDashboard from '../role/buyer/BuyerDashboard';
 import BuyerViewProduct from '../role/buyer/product/ViewProduct';
 import BuyerWeather from '../role/buyer/weather/Weather';
-// Admin Layout
-const AdminLayout = ({ children }) => (
-  <div className="flex">
-    <AdminNavBar />
-    <div className="flex-grow">{children}</div>
-  </div>
-);
+//  Layout Pages
+import FarmerLayout from "../layouts/FarmerLayout";
+import AdminLayout from "../layouts/AdminLayout";
 
-// FarmerLayout
-const FarmerLayout = ({ children }) => (
-  <div className="flex">
-    <FarmerNavbar />
-    <div className="flex-grow">{children}</div>
-  </div>
-);
-// Buyer Layout
-const BuyerLayout = ({ children }) => (
-  <div className="flex flex-col min-h-screen">
-    <div className="flex-grow">{children}</div>
-  </div>
-);
-export default function AppRoutes(){
+export default function AppRoutes({ sidebarOpen, toggleSidebar }){
     return(
         
         <Routes> 
@@ -284,7 +267,7 @@ export default function AppRoutes(){
         <Route path="/farmer/dashboard" element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["farmer"]}>
-                <FarmerLayout>
+                <FarmerLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                   <FarmerDashboard />
                 </FarmerLayout>
               </RoleRoute>
@@ -293,7 +276,7 @@ export default function AppRoutes(){
         <Route path="/farmer/product" element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["farmer"]}>
-                <FarmerLayout>
+                <FarmerLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                   <FarmerViewProduct/>
                 </FarmerLayout>
               </RoleRoute>
@@ -302,7 +285,7 @@ export default function AppRoutes(){
         <Route path="/farmer/product/post" element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["farmer"]}>
-                <FarmerLayout>
+                <FarmerLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                   <PostProduct />
                 </FarmerLayout>
               </RoleRoute>
@@ -311,7 +294,7 @@ export default function AppRoutes(){
         <Route path="/farmer/product/update/:id" element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["farmer"]}>
-                <FarmerLayout>
+                <FarmerLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                   <UpdateProduct />
                 </FarmerLayout>
               </RoleRoute>
@@ -320,7 +303,7 @@ export default function AppRoutes(){
         <Route path="/farmer/weather" element={
             <ProtectedRoute>
               <RoleRoute allowedRoles={["farmer"]}>
-                <FarmerLayout>
+                <FarmerLayout sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}>
                   <FarmerWeather />
                 </FarmerLayout>
               </RoleRoute>
@@ -332,27 +315,27 @@ export default function AppRoutes(){
         <Route path="/buyer/dashboard" element={
     <ProtectedRoute>
       <RoleRoute allowedRoles={["buyer"]}>
-        <BuyerLayout>
+        
           <BuyerDashboard />
-        </BuyerLayout>
+      
       </RoleRoute>
     </ProtectedRoute>
   } />
         <Route path="/buyer/product" element={
     <ProtectedRoute>
       <RoleRoute allowedRoles={["buyer"]}>
-        <BuyerLayout>
+       
           <BuyerViewProduct />
-        </BuyerLayout>
+       
       </RoleRoute>
     </ProtectedRoute>
   } />
         <Route path="/buyer/weather" element={
     <ProtectedRoute>
       <RoleRoute allowedRoles={["buyer"]}>
-        <BuyerLayout>
+       
           <BuyerWeather />
-        </BuyerLayout>
+        
       </RoleRoute>
     </ProtectedRoute>
   }/>

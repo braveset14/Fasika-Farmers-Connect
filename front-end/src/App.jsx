@@ -1,5 +1,4 @@
-
-import { BrowserRouter } from 'react-router-dom';
+import './styles/globals.css'
 import { useState } from 'react';
 
 import AppRoutes from './routes/Approutes';
@@ -10,23 +9,15 @@ import { PageWrapper } from './components/layout/PageWrapper';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
   return (
     
       <div className="app-layout">
-        {/* Sidebar */}
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-        <div className="main-area">
-          {/* Navbar */}
-          <NavBar onMenuClick={() => setSidebarOpen(true)} />
           <div className="pageWrapper">
           <PageWrapper >
-            <AppRoutes />
+            <AppRoutes sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar}/>
           </PageWrapper>
-</div>
-          <Footer />
-        </div>
+          </div>
       </div>
     
 )}

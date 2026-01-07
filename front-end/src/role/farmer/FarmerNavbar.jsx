@@ -1,9 +1,9 @@
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import farmerMenu from '../../menu/farmerMenu';
 
-const FarmerNavbar = () => {
-    const navigate = useNavigate();
+const FarmerNavbar = ({onMenuClick}) => {
+    const [showProfile, setShowProfile] = useState(false);
 
     const handleLogout = () => {
         console.log("Farmer Logout triggered");
@@ -11,34 +11,63 @@ const FarmerNavbar = () => {
     };
 
     return (
-        <nav className="bg-white border-r border-gray-100 w-64 min-h-screen p-8 flex flex-col">
-            <div className="mb-12">
-                <h2 className="text-2xl font-black text-green-700 tracking-tighter italic">Fasika<span className="text-gray-900">Farmer</span></h2>
-            </div>
+        <nav className="navbar">
+            {/* MENU BUTTON */}
+            <button className="menu-btn" onClick={onMenuClick}>☰</button>
 
-            <div className="flex-grow space-y-4">
+            {/* Branding */}
+            <h2 className="navbar-logo">Fasika Farmer</h2>
+
+            {/* GLOBAL SEARCH */}
+            <input
+                className="global-search"
+                placeholder="Search crops, prices, advisory..."
+            />
+
+            {/* LOCATION SELECTOR */}
+            <select className="location-selector">
+                <option>Oromia</option>
+                <option>Amhara</option>
+                <option>Tigray</option>
+                <option>SNNPR</option>
+            </select>
+
+            <div className="navbar-actions">
                 {farmerMenu.map(item => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         className={({ isActive }) =>
-                            `flex items-center gap-4 px-6 py-4 rounded-3xl font-bold transition-all ${isActive
-                                ? 'bg-green-600 text-white shadow-lg shadow-green-100'
-                                : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                            }`
+                            `myLinks ${isActive ? 'active' : ''}`
                         }
                     >
                         {item.label}
                     </NavLink>
                 ))}
-            </div>
 
-            <button
-                onClick={handleLogout}
-                className="mt-auto flex items-center gap-4 px-6 py-4 rounded-3xl font-bold text-red-400 hover:bg-red-50 hover:text-red-600 transition-all"
-            >
-                <span>🚪</span> Logout
-            </button>
+                {/* NOTIFICATION BELL */}
+                <Link to="/notifications" className="icon-btn">
+                    🔔
+                </Link>
+
+                {/* PROFILE */}
+                <button className="icon-btn" onClick={() => setShowProfile(!showProfile)}>
+                    👤
+                </button>
+
+                {showProfile && (
+                    <div className="dropdown">
+                        <div className="myLinks">
+                            <Link to="/profile">Account Info</Link>
+                            <Link to="/preferences">Preferences</Link>
+                            <button onClick={handleLogout}>Logout</button>
+                        </div>
+                    </div>
+                )}
+
+                {/* LOGOUT BUTTON */}
+                <button className="icon-btn" onClick={handleLogout}>🚪</button>
+            </div>
         </nav>
     );
 };

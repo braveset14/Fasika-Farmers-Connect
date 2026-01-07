@@ -19,6 +19,7 @@ export function NavBar({ onMenuClick }) {
         placeholder="Search crops, prices, advisory..."
       />
 
+
       {/* LOCATION SELECTOR */}
       <select className="location-selector">
         <option>Oromia</option>

@@ -1,26 +1,56 @@
 import { Link } from 'react-router-dom';
 
-export default function Sidebar({ isOpen, onClose }) {
+const linksByRole = {
+  farmer: [
+    { name: "Home", path: "/" },
+    { name: "Weather", path: "/weather" },
+    { name: "Market", path: "/market" },
+    { name: "Sell Product", path: "/market/sell" },
+    { name: "Advisory", path: "/advisory" },
+    { name: "Notifications", path: "/notifications" },
+    { name: "Help", path: "/help" },
+  ],
+  buyer: [
+    { name: "Dashboard", path: "/buyer/dashboard" },
+    { name: "Market", path: "/buyer/product" },
+    { name: "Weather", path: "/buyer/weather" },
+    { name: "Notifications", path: "/notifications" },
+  ],
+  admin: [
+    { name: "Dashboard", path: "/admin/dashboard" },
+    { name: "Management", path: "/admin/management" },
+    { name: "Products", path: "/admin/product" },
+    { name: "Users", path: "/admin/user" },
+    { name: "Weather", path: "/admin/weather" },
+    { name: "Tips", path: "/admin/tips" },
+  ],
+};
+
+export default function Sidebar({ role, isOpen, onClose }) {
+  const links = linksByRole[role] || [];
+
   return (
     <>
       {/* Overlay */}
       {isOpen && <div className="sidebar-overlay" onClick={onClose}></div>}
 
-      <aside className={`sidebar ${isOpen ? "open" : ""}`}>
+      <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <button className="close-btn" onClick={onClose}>✕</button>
 
-        <h3 className="sidebar-title">Farmer Panel</h3>
+        {/* Dynamic panel title */}
+        <h3 className="sidebar-title">
+          {(role ? role.charAt(0).toUpperCase() + role.slice(1) : "User")} Panel
+        </h3>
 
+        {/* Navigation links */}
         <nav className="sidebar-nav">
-          <Link to="/" onClick={onClose}>Home</Link>
-          <Link to="/weather" onClick={onClose}>Weather</Link>
-          <Link to="/market" onClick={onClose}>Market</Link>
-          <Link to="/market/sell" onClick={onClose}>Sell Product</Link>
-          <Link to="/advisory" onClick={onClose}>Advisory</Link>
-          <Link to="/notifications" onClick={onClose}>Notifications</Link>
-          <Link to="/help" onClick={onClose}>Help</Link>
+          {links.map(link => (
+            <Link key={link.name} to={link.path} onClick={onClose}>
+              {link.name}
+            </Link>
+          ))}
         </nav>
-      </aside>
+      </div>
     </>
   );
 }
