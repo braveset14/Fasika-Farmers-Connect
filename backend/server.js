@@ -14,8 +14,8 @@ app.use('/api/weather', weatherRoutes);
 // Middleware
 const allowedOrigins = [
   'http://localhost:5173',  // Local dev
-  'https://fasika-farmers-connect.onrender.com',  // Your Render backend
-  'https://vercel.com/yeabseras-projects-c6ad3ba9/fasika-farmers-connect/5kQPrytF9GG3Dk6q8bTAARydJQBC'
+  'https://fasika-farmers-connect.onrender.com', 
+  'https://fasika-farmers-connect.vercel.app/'
 ];
 app.use(cors({
   origin: function (origin, callback) {
