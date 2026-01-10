@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --color-fasika-dark: #050a06;
+  --color-fasika-card: #0d160f;
+  --color-fasika-border: #1a231c;
+  --color-fasika-accent: #00df82;
+  --color-fasika-accent-hover: #00fa92;
+  --color-fasika-text-bright: #ffffff;
+  --color-fasika-text-muted: #94a3b8;
+
+  --font-inter: "Inter", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-fasika-dark text-fasika-text-bright font-inter antialiased;
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-bold tracking-tight;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-fasika-accent text-fasika-dark px-6 py-3 rounded-xl font-bold transition-all hover:bg-fasika-accent-hover hover:scale-105 active:scale-95 text-center;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent border border-gray-700 text-fasika-text-bright px-6 py-3 rounded-xl font-bold transition-all hover:bg-white/5 text-center;
+  }
+
+  .glass-card {
+    @apply bg-fasika-card border border-fasika-border rounded-2xl p-6 shadow-xl;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 py-20;
+  }
+}
