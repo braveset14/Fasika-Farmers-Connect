@@ -12,8 +12,27 @@ const marketRoutes = require('./src/routes/marketRoutes');
 const weatherRoutes = require('./src/routes/weatherRoutes');
 app.use('/api/weather', weatherRoutes);
 // Middleware
-app.use(cors());
-// Add this right after CORS middleware
+const allowedOrigins = [
+  'http://localhost:5173',  // Local dev
+  'https://fasika-farmers-connect.onrender.com',  // Your Render backend
+  'https://fasika-farmers.vercel.app'  // Your future frontend
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'CORS policy blocks this origin. Allowed: ' + allowedOrigins.join(', ');
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -49,14 +68,22 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({
     message: '🚜 Fasika Farmers Connect API',
-    status: 'online',
+    status: 'DEPLOYED 🎉',
     version: '1.0.0',
+    deployed: true,
+    environment: process.env.NODE_ENV || 'development',
+    url: 'https://fasika-farmers-connect.onrender.com',
     timestamp: new Date().toISOString(),
     endpoints: [
       'POST /api/auth/login',
       'POST /api/auth/register',
       'GET /api/users/profile',
-      'GET /api/health'
+      'GET /api/health',
+      'GET /api/products',
+      'GET /api/market/prices',
+      'GET /api/dashboard',
+      'GET /api/advisory',
+      'GET /api/weather/forecast'
     ]
   });
 });
@@ -66,7 +93,10 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     service: 'FFC Backend API',
-    timestamp: new Date().toISOString()
+    environment: process.env.NODE_ENV,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+     database: 'MongoDB Atlas'
   });
 });
 
