@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     User,
     Phone,
@@ -14,13 +14,107 @@ import {
 
 const ProfileSettings = () => {
     const [selectedCrops, setSelectedCrops] = useState(['Teff', 'Maize']);
-    const [showAlert, setShowAlert] = useState(true);
+    const [showAlert, setShowAlert] = useState(false);
+    const [userData, setUserData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        region: 'Oromia',
+        zone: 'East Shewa',
+        village: '',
+        farmSize: '0.0'
+    });
+
+    // Fetch user profile data
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                setLoading(true);
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    console.error('No token found');
+                    return;
+                }
+
+                const response = await fetch('/api/users/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.user) {
+                    setUserData(data.user);
+                    // Populate form with user data
+                    setFormData({
+                        name: data.user.name || '',
+                        email: data.user.email || '',
+                        phone: data.user.phone || '+251 91 123 4567', // Default if no phone
+                        region: data.user.region || 'Oromia',
+                        zone: data.user.zone || 'East Shewa',
+                        village: data.user.village || '',
+                        farmSize: data.user.farmSize || '0.0'
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
 
     const toggleCrop = (crop) => {
         setSelectedCrops(prev =>
             prev.includes(crop) ? prev.filter(c => c !== crop) : [...prev, crop]
         );
     };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/users/profile', {
+                method: 'PUT', // Or 'POST' depending on your backend
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                setShowAlert(true);
+                setTimeout(() => setShowAlert(false), 3000);
+            }
+        } catch (error) {
+            console.error('Error saving profile:', error);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="text-white">Loading profile...</div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -47,11 +141,28 @@ const ProfileSettings = () => {
                 {/* Your Details */}
                 <Section title="Your details" icon={User}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <InputField label="Full name" value="Abebe Bikila" required />
-                        <InputField label="Phone number" value="+251 91 123 4567" required />
+                        <InputField 
+                            label="Full name" 
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
+                            required 
+                        />
+                        <InputField 
+                            label="Phone number" 
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleInputChange}
+                            required 
+                        />
                     </div>
                     <div className="mt-6">
-                        <InputField label="Email address (Optional)" value="example@email.com" />
+                        <InputField 
+                            label="Email address (Optional)" 
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                        />
                     </div>
                 </Section>
 
@@ -61,7 +172,12 @@ const ProfileSettings = () => {
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">Region <span className="text-red-500">*</span></label>
                             <div className="relative">
-                                <select className="w-full bg-[#050a06] border border-[#1a231c] text-white text-sm px-4 py-3 rounded-xl appearance-none outline-none focus:border-[#00df82]/50 transition-all">
+                                <select 
+                                    name="region"
+                                    value={formData.region}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-[#050a06] border border-[#1a231c] text-white text-sm px-4 py-3 rounded-xl appearance-none outline-none focus:border-[#00df82]/50 transition-all"
+                                >
                                     <option>Oromia</option>
                                     <option>Amhara</option>
                                     <option>SNNPR</option>
@@ -70,12 +186,29 @@ const ProfileSettings = () => {
                                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
                             </div>
                         </div>
-                        <InputField label="Zone / Woreda" value="East Shewa" />
+                        <InputField 
+                            label="Zone / Woreda" 
+                            name="zone"
+                            value={formData.zone}
+                            onChange={handleInputChange}
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                        <InputField label="Village / Kebele (Optional)" placeholder="Enter your village" />
-                        <InputField label="Farm size (Hectares)" value="0.0" type="number" />
+                        <InputField 
+                            label="Village / Kebele (Optional)" 
+                            name="village"
+                            placeholder="Enter your village"
+                            value={formData.village}
+                            onChange={handleInputChange}
+                        />
+                        <InputField 
+                            label="Farm size (Hectares)" 
+                            name="farmSize"
+                            value={formData.farmSize}
+                            onChange={handleInputChange}
+                            type="number" 
+                        />
                     </div>
 
                     <div className="mt-8">
@@ -109,7 +242,10 @@ const ProfileSettings = () => {
                 <button className="px-8 py-3 bg-[#0d160f] border border-[#1a231c] text-white text-sm font-black rounded-xl hover:bg-white/5 transition-all">
                     Cancel Changes
                 </button>
-                <button className="px-10 py-3 bg-[#00df82] text-[#050a06] text-sm font-black rounded-xl hover:bg-[#00df82]/90 transition-all shadow-lg">
+                <button 
+                    onClick={handleSaveProfile}
+                    className="px-10 py-3 bg-[#00df82] text-[#050a06] text-sm font-black rounded-xl hover:bg-[#00df82]/90 transition-all shadow-lg"
+                >
                     Save Profile
                 </button>
             </div>
@@ -127,14 +263,16 @@ const Section = ({ title, icon: Icon, children }) => (
     </div>
 );
 
-const InputField = ({ label, value, placeholder, required, type = "text" }) => (
+const InputField = ({ label, name, value, placeholder, required, type = "text", onChange }) => (
     <div className="space-y-2">
         <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         <input
             type={type}
-            defaultValue={value}
+            name={name}
+            value={value}
+            onChange={onChange}
             placeholder={placeholder}
             className="w-full bg-[#050a06] border border-[#1a231c] text-white text-sm px-4 py-3 rounded-xl outline-none focus:border-[#00df82]/50 transition-all font-medium placeholder:text-gray-700"
         />
