@@ -46,7 +46,8 @@ const RegisterForm = () => {
     try {
       // Call real backend API for registration
       console.log('Registering user:', { name, email, role, location });
-      const registerData = await authService.register({
+      
+      const response = await authService.register({
         name,
         email,
         password,
@@ -54,36 +55,58 @@ const RegisterForm = () => {
         location: role === 'farmer' ? location : undefined
       });
 
-      console.log('Registration successful:', registerData);
+      console.log('Registration response:', response);
       
-      // Auto-login after successful registration
-      const loginData = await authService.login({ email, password });
-      console.log('Auto-login successful:', loginData);
-      
-      // Store token and user data in auth context
-      login(loginData.user, loginData.token);
-      
-      // Role-based redirection
-      let redirectPath = '/';
-      switch (loginData.user?.role || role) {
-        case 'admin':
-          redirectPath = '/admin/dashboard';
-          break;
-        case 'buyer':
-          redirectPath = '/buyer/dashboard';
-          break;
-        case 'farmer':
-          redirectPath = '/farmer/dashboard';
-          break;
-        default:
-          redirectPath = '/dashboard';
+      // Check if registration was successful
+      if (response.data.success) {
+        // Registration successful - store token and user
+        const { token, user } = response.data;
+        
+        console.log('Registration successful, token received:', token ? 'Yes' : 'No');
+        console.log('User data:', user);
+        
+        // Store token and user data in auth context
+        login(user, token);
+        
+        // Role-based redirection
+        let redirectPath = '/';
+        switch (user?.role || role) {
+          case 'admin':
+            redirectPath = '/admin/dashboard';
+            break;
+          case 'buyer':
+            redirectPath = '/buyer/dashboard';
+            break;
+          case 'farmer':
+            redirectPath = '/farmer/dashboard';
+            break;
+          default:
+            redirectPath = '/dashboard';
+        }
+        
+        console.log('Redirecting to:', redirectPath);
+        navigate(redirectPath);
+      } else {
+        // Registration failed
+        setError(response.data.message || 'Registration failed');
       }
-      
-      navigate(redirectPath);
       
     } catch (error) {
       console.error('Registration failed:', error);
-      setError(error.message || 'Registration failed. Please try again.');
+      
+      // Handle different error formats
+      if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else if (error.response?.data?.errors) {
+        // Handle validation errors
+        const errorMsg = error.response.data.errors.map(err => err.msg).join(', ');
+        setError(errorMsg);
+      } else if (error.response?.data) {
+        // Handle other backend errors
+        setError(error.response.data || 'Registration failed');
+      } else {
+        setError(error.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
