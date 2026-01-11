@@ -148,95 +148,96 @@ if (!isPasswordValid) {
   }
 });
 // Registration route
-
-app.post('/api/auth/register', async (req, res) => {
-  console.log('📨 Registration request:', req.body);
+const { registerUser } = require('./src/controllers/userController');
+app.post('/api/auth/register', registerUser);
+// app.post('/api/auth/register', async (req, res) => {
+//   console.log('📨 Registration request:', req.body);
   
-  const { name, email, password, role = 'farmer', location } = req.body;
+//   const { name, email, password, role = 'farmer', location } = req.body;
   
-  // Validation
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'Name, email, and password are required'
-    });
-  }
+//   // Validation
+//   if (!name || !email || !password) {
+//     return res.status(400).json({
+//       success: false,
+//       message: 'Name, email, and password are required'
+//     });
+//   }
   
-  try {
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+//   try {
+//     // Check if user already exists
+//     const existingUser = await User.findOne({ email: email.toLowerCase() });
     
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists with this email'
-      });
-    }
+//     if (existingUser) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'User already exists with this email'
+//       });
+//     }
     
-    // Create new user
-    const user = await User.create({
-      name,
-      email: email.toLowerCase(),
-      password, // Note: In production, hash this!
-      role,
-      location: location || '',
-      verified: false
-    });
+//     // Create new user
+//     const user = await User.create({
+//       name,
+//       email: email.toLowerCase(),
+//       password, // Note: In production, hash this!
+//       role,
+//       location: location || '',
+//       verified: false
+//     });
     
-    console.log(`✅ User registered: ${user.email} (ID: ${user._id})`);
+//     console.log(`✅ User registered: ${user.email} (ID: ${user._id})`);
     
-    // Generate a simple token (for now)
-    const token = jwt.sign(
-  { id: user._id, role: user.role },
-  process.env.JWT_SECRET,
-  { expiresIn: '30d' }
-);
+//     // Generate a simple token (for now)
+//     const token = jwt.sign(
+//   { id: user._id, role: user.role },
+//   process.env.JWT_SECRET,
+//   { expiresIn: '30d' }
+// );
     
-    // Return user data (excluding password)
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      location: user.location,
-      verified: user.verified,
-      createdAt: user.createdAt
-    };
+//     // Return user data (excluding password)
+//     const userResponse = {
+//       id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       role: user.role,
+//       location: user.location,
+//       verified: user.verified,
+//       createdAt: user.createdAt
+//     };
     
-    res.status(201).json({
-      success: true,
-      message: 'Registration successful!',
-      token: token,
-      user: userResponse
-    });
+//     res.status(201).json({
+//       success: true,
+//       message: 'Registration successful!',
+//       token: token,
+//       user: userResponse
+//     });
     
-  } catch (error) {
-    console.error('❌ Registration error:', error);
+//   } catch (error) {
+//     console.error('❌ Registration error:', error);
     
-    // Handle duplicate key error (unique email)
-    if (error.code === 11000) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email already exists'
-      });
-    }
+//     // Handle duplicate key error (unique email)
+//     if (error.code === 11000) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Email already exists'
+//       });
+//     }
     
-    // Handle validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(', ')
-      });
-    }
+//     // Handle validation errors
+//     if (error.name === 'ValidationError') {
+//       const messages = Object.values(error.errors).map(err => err.message);
+//       return res.status(400).json({
+//         success: false,
+//         message: messages.join(', ')
+//       });
+//     }
     
-    res.status(500).json({
-      success: false,
-      message: 'Server error during registration',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
+//     res.status(500).json({
+//       success: false,
+//       message: 'Server error during registration',
+//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+//     });
+//   }
+// });
 
 // User profile
 app.get('/api/users/profile', protect, async (req, res) => {
