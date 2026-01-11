@@ -13,25 +13,35 @@ const loginUser = async (req, res) => {
 
         if (user && (await user.matchPassword(password))) {
             res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-                phone: user.phone,
-                location: user.location,
-                region: user.region,
-                zone: user.zone,
-                village: user.village,
-                farmSize: user.farmSize,
-                token: generateToken(user._id)
+                success: true,
+                message: 'Login successful!',
+                token: generateToken(user._id),
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status,
+                    phone: user.phone,
+                    location: user.location,
+                    region: user.region,
+                    zone: user.zone,
+                    village: user.village,
+                    farmSize: user.farmSize
+                }
             });
         } else {
-            res.status(401).json({ message: 'Invalid email or password' });
+            res.status(401).json({ 
+                success: false,
+                message: 'Invalid email or password' 
+            });
         }
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ message: 'Server error during login' });
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error during login' 
+        });
     }
 };
 
@@ -42,7 +52,10 @@ const registerUser = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ 
+                success: false,
+                message: errors.array()[0]?.msg || 'Validation error'
+            });
         }
 
         const { name, email, password, role, location } = req.body;
@@ -50,7 +63,10 @@ const registerUser = async (req, res) => {
         const userExists = await User.findOne({ email });
 
         if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ 
+                success: false,
+                message: 'User already exists' 
+            });
         }
 
         // Create user with all fields including location
@@ -64,29 +80,23 @@ const registerUser = async (req, res) => {
 
         const user = await User.create(userData);
 
-        if (user) {
-            res.status(201).json({
-                success: true, // ADD THIS - frontend expects it
-                message: 'Registration successful!',
-                token: generateToken(user._id),
-                user: {
-                    _id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    status: user.status
-                }
-            });
-        } else {
-            res.status(400).json({ 
-                success: false,
-                message: 'Invalid user data' 
-            });
-        }
+        res.status(201).json({
+            success: true,
+            message: 'Registration successful!',
+            token: generateToken(user._id),
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                location: user.location
+            }
+        });
+        
     } catch (error) {
         console.error('Registration error:', error);
         
-        // Handle duplicate key error
         if (error.code === 11000) {
             return res.status(400).json({ 
                 success: false,
@@ -110,25 +120,34 @@ const getUserProfile = async (req, res) => {
 
         if (user) {
             res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status,
-                phone: user.phone || '',
-                location: user.location || '',
-                region: user.region || '',
-                zone: user.zone || '',
-                village: user.village || '',
-                farmSize: user.farmSize || 0,
-                mainCrops: user.mainCrops || []
+                success: true,
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status,
+                    phone: user.phone || '',
+                    location: user.location || '',
+                    region: user.region || '',
+                    zone: user.zone || '',
+                    village: user.village || '',
+                    farmSize: user.farmSize || 0,
+                    mainCrops: user.mainCrops || []
+                }
             });
         } else {
-            res.status(404).json({ message: 'User not found' });
+            res.status(404).json({ 
+                success: false,
+                message: 'User not found' 
+            });
         }
     } catch (error) {
         console.error('Get profile error:', error);
-        res.status(500).json({ message: 'Server error fetching profile' });
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error fetching profile' 
+        });
     }
 };
 
@@ -140,7 +159,10 @@ const updateUserProfile = async (req, res) => {
         const user = await User.findById(req.user._id);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'User not found' 
+            });
         }
 
         // Update fields if provided
@@ -158,19 +180,22 @@ const updateUserProfile = async (req, res) => {
         const updatedUser = await user.save();
 
         res.json({
-            _id: updatedUser._id,
-            name: updatedUser.name,
-            email: updatedUser.email,
-            role: updatedUser.role,
-            status: updatedUser.status,
-            phone: updatedUser.phone,
-            location: updatedUser.location,
-            region: updatedUser.region,
-            zone: updatedUser.zone,
-            village: updatedUser.village,
-            farmSize: updatedUser.farmSize,
-            mainCrops: updatedUser.mainCrops,
-            message: 'Profile updated successfully'
+            success: true,
+            message: 'Profile updated successfully',
+            user: {
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role,
+                status: updatedUser.status,
+                phone: updatedUser.phone,
+                location: updatedUser.location,
+                region: updatedUser.region,
+                zone: updatedUser.zone,
+                village: updatedUser.village,
+                farmSize: updatedUser.farmSize,
+                mainCrops: updatedUser.mainCrops
+            }
         });
 
     } catch (error) {
@@ -178,18 +203,22 @@ const updateUserProfile = async (req, res) => {
         
         if (error.name === 'ValidationError') {
             return res.status(400).json({ 
-                message: 'Validation error',
-                error: error.message 
+                success: false,
+                message: 'Validation error: ' + error.message 
             });
         }
         
         if (error.code === 11000) {
             return res.status(400).json({ 
+                success: false,
                 message: 'Email already exists' 
             });
         }
         
-        res.status(500).json({ message: 'Server error updating profile' });
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error updating profile' 
+        });
     }
 };
 
