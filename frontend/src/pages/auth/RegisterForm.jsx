@@ -59,33 +59,51 @@ const RegisterForm = () => {
       
       // Check if registration was successful
       if (response.data.success) {
-        // Registration successful - store token and user
-        const { token, user } = response.data;
+        // Registration successful - now auto-login
+        console.log('Registration successful, attempting auto-login...');
         
-        console.log('Registration successful, token received:', token ? 'Yes' : 'No');
-        console.log('User data:', user);
-        
-        // Store token and user data in auth context
-        login(user, token);
-        
-        // Role-based redirection
-        let redirectPath = '/';
-        switch (user?.role || role) {
-          case 'admin':
-            redirectPath = '/admin/dashboard';
-            break;
-          case 'buyer':
-            redirectPath = '/buyer/dashboard';
-            break;
-          case 'farmer':
-            redirectPath = '/farmer/dashboard';
-            break;
-          default:
-            redirectPath = '/dashboard';
+        try {
+          // Auto-login with the same credentials
+          const loginResponse = await authService.login({ 
+            email, 
+            password 
+          });
+          
+          console.log('Auto-login response:', loginResponse);
+          
+          if (loginResponse.data.success) {
+            const { user } = loginResponse.data;
+            
+            console.log('Auto-login successful, user:', user);
+            
+            // Store user data in auth context
+            login(user);
+            
+            // Role-based redirection
+            let redirectPath = '/';
+            switch (user?.role || role) {
+              case 'admin':
+                redirectPath = '/admin/dashboard';
+                break;
+              case 'buyer':
+                redirectPath = '/buyer/dashboard';
+                break;
+              case 'farmer':
+                redirectPath = '/farmer/dashboard';
+                break;
+              default:
+                redirectPath = '/dashboard';
+            }
+            
+            console.log('Redirecting to:', redirectPath);
+            navigate(redirectPath);
+          } else {
+            setError('Registration successful but auto-login failed: ' + (loginResponse.data.message || 'Please login manually.'));
+          }
+        } catch (loginError) {
+          console.error('Auto-login failed:', loginError);
+          setError('Registration successful! Please login with your credentials.');
         }
-        
-        console.log('Redirecting to:', redirectPath);
-        navigate(redirectPath);
       } else {
         // Registration failed
         setError(response.data.message || 'Registration failed');
@@ -104,6 +122,9 @@ const RegisterForm = () => {
       } else if (error.response?.data) {
         // Handle other backend errors
         setError(error.response.data || 'Registration failed');
+      } else if (error.request) {
+        // Network error
+        setError('Network error. Please check your connection.');
       } else {
         setError(error.message || 'Registration failed. Please try again.');
       }
