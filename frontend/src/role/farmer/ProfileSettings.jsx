@@ -105,7 +105,7 @@ const ProfileSettings = () => {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(updateData)
             });
 
             const data = await response.json();
