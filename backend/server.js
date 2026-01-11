@@ -18,20 +18,11 @@ const allowedOrigins = [
   'https://fasika-farmers-connect.vercel.app'
 ];
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'CORS policy blocks this origin. Allowed: ' + allowedOrigins.join(', ');
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  },
+  origin: '*',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+app.options('*', cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/products', productRoutes);
