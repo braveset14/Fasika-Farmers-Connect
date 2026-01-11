@@ -11,6 +11,8 @@ const connectDB = require('./src/config/db');
 const productRoutes = require('./src/routes/productRoutes');
 const marketRoutes = require('./src/routes/marketRoutes');
 const weatherRoutes = require('./src/routes/weatherRoutes');
+const { registerUser,loginUser } = require('./src/controllers/userController');
+
 app.use('/api/weather', weatherRoutes);
 // Middleware
 const allowedOrigins = [
@@ -76,169 +78,8 @@ app.get('/api/health', (req, res) => {
      database: 'MongoDB Atlas'
   });
 });
-
-// LOGIN ROUTE 
-
-app.post('/api/auth/login', async (req, res) => {
-  console.log('📨 Login request for:', req.body.email);
-  
-  const { email, password } = req.body;
-  
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: 'Email and password are required'
-    });
-  }
-  
-  try {
-    // Find user in MongoDB
-    const user = await User.findOne({ email: email.toLowerCase() });
-    
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-      });
-    }
-    
-    // Check password (simple comparison for now)
-  
-const isPasswordValid = await user.matchPassword(password);
-if (!isPasswordValid) {
-    return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password'
-    });
-}
-    
-    // Generate token
-    const token = jwt.sign(
-  { id: user._id, role: user.role },
-  process.env.JWT_SECRET,
-  { expiresIn: '30d' }
-);
-    
-    // User response without password
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      location: user.location,
-      verified: user.verified,
-      createdAt: user.createdAt
-    };
-    
-    console.log(`✅ Login successful for: ${user.email}`);
-    
-    res.json({
-      success: true,
-      message: 'Login successful!',
-      token: token,
-      user: userResponse
-    });
-    
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during login'
-    });
-  }
-});
-// Registration route
-const { registerUser } = require('./src/controllers/userController');
 app.post('/api/auth/register', registerUser);
-// app.post('/api/auth/register', async (req, res) => {
-//   console.log('📨 Registration request:', req.body);
-  
-//   const { name, email, password, role = 'farmer', location } = req.body;
-  
-//   // Validation
-//   if (!name || !email || !password) {
-//     return res.status(400).json({
-//       success: false,
-//       message: 'Name, email, and password are required'
-//     });
-//   }
-  
-//   try {
-//     // Check if user already exists
-//     const existingUser = await User.findOne({ email: email.toLowerCase() });
-    
-//     if (existingUser) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'User already exists with this email'
-//       });
-//     }
-    
-//     // Create new user
-//     const user = await User.create({
-//       name,
-//       email: email.toLowerCase(),
-//       password, // Note: In production, hash this!
-//       role,
-//       location: location || '',
-//       verified: false
-//     });
-    
-//     console.log(`✅ User registered: ${user.email} (ID: ${user._id})`);
-    
-//     // Generate a simple token (for now)
-//     const token = jwt.sign(
-//   { id: user._id, role: user.role },
-//   process.env.JWT_SECRET,
-//   { expiresIn: '30d' }
-// );
-    
-//     // Return user data (excluding password)
-//     const userResponse = {
-//       id: user._id,
-//       name: user.name,
-//       email: user.email,
-//       role: user.role,
-//       location: user.location,
-//       verified: user.verified,
-//       createdAt: user.createdAt
-//     };
-    
-//     res.status(201).json({
-//       success: true,
-//       message: 'Registration successful!',
-//       token: token,
-//       user: userResponse
-//     });
-    
-//   } catch (error) {
-//     console.error('❌ Registration error:', error);
-    
-//     // Handle duplicate key error (unique email)
-//     if (error.code === 11000) {
-//       return res.status(400).json({
-//         success: false,
-//         message: 'Email already exists'
-//       });
-//     }
-    
-//     // Handle validation errors
-//     if (error.name === 'ValidationError') {
-//       const messages = Object.values(error.errors).map(err => err.message);
-//       return res.status(400).json({
-//         success: false,
-//         message: messages.join(', ')
-//       });
-//     }
-    
-//     res.status(500).json({
-//       success: false,
-//       message: 'Server error during registration',
-//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
-//     });
-//   }
-// });
-
+app.post('/api/auth/login', loginUser);
 // User profile
 app.get('/api/users/profile', protect, async (req, res) => {
   try {
