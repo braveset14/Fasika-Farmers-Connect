@@ -148,7 +148,7 @@
 //   }
 // }
 // startServer();
-// backend/server.js - ULTRA MINIMAL WORKING VERSION
+// backend/server.js - ADD LOGIN ROUTE
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -226,6 +226,60 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+// ADD LOGIN ROUTE
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    console.log('Login attempt:', req.body.email);
+    
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and password required'
+      });
+    }
+    
+    // Find user
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Check password (plaintext comparison since we stored it plaintext)
+    if (user.password !== password) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+    
+    // Return user data (without password)
+    res.json({
+      success: true,
+      message: 'Login successful',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location
+      }
+    });
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during login'
+    });
+  }
+});
+
 // CONNECT TO MONGODB
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://default:password@cluster.mongodb.net/fasika';
 
@@ -236,4 +290,8 @@ mongoose.connect(MONGODB_URI)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📝 Registration: POST https://fasika-farmers-connect.onrender.com/api/auth/register`);
+  console.log(`🔐 Login: POST https://fasika-farmers-connect.onrender.com/api/auth/login`);
 });
+
+// backend/server.js - ULTRA MINIMAL WORKING VERSION
