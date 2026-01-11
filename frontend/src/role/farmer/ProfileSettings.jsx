@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const ProfileSettings = () => {
-    const [selectedCrops, setSelectedCrops] = useState(['Teff', 'Maize']);
+    const [selectedCrops, setSelectedCrops] = useState([]);
     const [showAlert, setShowAlert] = useState(false);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -47,20 +47,22 @@ const ProfileSettings = () => {
                 });
 
                 const data = await response.json();
+                if (data) {
+                setUserData(data);
+                // Populate form with user data
+                setFormData({
+                    name: data.name || '',
+                    email: data.email || '',
+                    phone: data.phone || '+251 91 123 4567',
+                    region: data.region || 'Oromia',
+                    zone: data.zone || 'East Shewa',
+                    village: data.village || '',
+                    farmSize: data.farmSize?.toString() || '0.0'
+                });
+                // Set selected crops from backend
+                setSelectedCrops(data.mainCrops || []);
+            }
                 
-                if (data.success && data.user) {
-                    setUserData(data.user);
-                    // Populate form with user data
-                    setFormData({
-                        name: data.user.name || '',
-                        email: data.user.email || '',
-                        phone: data.user.phone || '+251 91 123 4567', // Default if no phone
-                        region: data.user.region || 'Oromia',
-                        zone: data.user.zone || 'East Shewa',
-                        village: data.user.village || '',
-                        farmSize: data.user.farmSize || '0.0'
-                    });
-                }
             } catch (error) {
                 console.error('Error fetching profile:', error);
             } finally {
@@ -88,8 +90,17 @@ const ProfileSettings = () => {
     const handleSaveProfile = async () => {
         try {
             const token = localStorage.getItem('token');
+            const updateData = {
+            name: formData.name,
+            phone: formData.phone,
+            region: formData.region,
+            zone: formData.zone,
+            village: formData.village,
+            farmSize: parseFloat(formData.farmSize) || 0.0,
+            mainCrops: selectedCrops // Include selected crops
+        };
             const response = await fetch('/api/users/profile', {
-                method: 'PUT', // Or 'POST' depending on your backend
+                method: 'PUT', 
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -99,10 +110,25 @@ const ProfileSettings = () => {
 
             const data = await response.json();
             
-            if (data.success) {
-                setShowAlert(true);
-                setTimeout(() => setShowAlert(false), 3000);
-            }
+           if (data) {
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 3000);
+            // Update user data with new values
+            setUserData(data);
+            // Also update form data
+            setFormData({
+                ...formData,
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                region: data.region,
+                zone: data.zone,
+                village: data.village,
+                farmSize: data.farmSize?.toString() || '0.0'
+            });
+            // Update crops
+            setSelectedCrops(data.mainCrops || []);
+        }
         } catch (error) {
             console.error('Error saving profile:', error);
         }
