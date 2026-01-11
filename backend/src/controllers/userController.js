@@ -6,27 +6,32 @@ const { validationResult } = require('express-validator');
 // @route   POST /api/auth/login
 // @access  Public
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-            phone: user.phone,
-            location: user.location,
-            region: user.region,
-            zone: user.zone,
-            village: user.village,
-            farmSize: user.farmSize,
-            token: generateToken(user._id)
-        });
-    } else {
-        res.status(401).json({ message: 'Invalid email or password' });
+        if (user && (await user.matchPassword(password))) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                phone: user.phone,
+                location: user.location,
+                region: user.region,
+                zone: user.zone,
+                village: user.village,
+                farmSize: user.farmSize,
+                token: generateToken(user._id)
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error during login' });
     }
 };
 
@@ -34,38 +39,65 @@ const loginUser = async (req, res) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 
-    const { name, email, password, role } = req.body;
+        const { name, email, password, role, location } = req.body;
 
-    const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ email });
 
-    if (userExists) {
-        res.status(400).json({ message: 'User already exists' });
-        return;
-    }
+        if (userExists) {
+            return res.status(400).json({ message: 'User already exists' });
+        }
 
-    const user = await User.create({
-        name,
-        email,
-        password,
-        role: role || 'buyer'
-    });
+        // Create user with all fields including location
+        const userData = {
+            name,
+            email,
+            password,
+            role: role || 'buyer',
+            location: location || ''
+        };
 
-    if (user) {
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-            token: generateToken(user._id)
+        const user = await User.create(userData);
+
+        if (user) {
+            res.status(201).json({
+                success: true, // ADD THIS - frontend expects it
+                message: 'Registration successful!',
+                token: generateToken(user._id),
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    status: user.status
+                }
+            });
+        } else {
+            res.status(400).json({ 
+                success: false,
+                message: 'Invalid user data' 
+            });
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Email already exists' 
+            });
+        }
+        
+        res.status(500).json({ 
+            success: false,
+            message: 'Server error during registration' 
         });
-    } else {
-        res.status(400).json({ message: 'Invalid user data' });
     }
 };
 
@@ -73,28 +105,36 @@ const registerUser = async (req, res) => {
 // @route   GET /api/users/profile
 // @access  Private
 const getUserProfile = async (req, res) => {
-    const user = await User.findById(req.user._id);
+    try {
+        const user = await User.findById(req.user._id);
 
-    if (user) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            status: user.status,
-            phone: user.phone,
-            location: user.location,
-            region: user.region || '',
-            zone: user.zone || '',
-            village: user.village || '',
-            farmSize: user.farmSize || 0,
-            mainCrops: user.mainCrops || []
-        });
-    } else {
-        res.status(404).json({ message: 'User not found' });
+        if (user) {
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                status: user.status,
+                phone: user.phone || '',
+                location: user.location || '',
+                region: user.region || '',
+                zone: user.zone || '',
+                village: user.village || '',
+                farmSize: user.farmSize || 0,
+                mainCrops: user.mainCrops || []
+            });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Get profile error:', error);
+        res.status(500).json({ message: 'Server error fetching profile' });
     }
 };
 
+// @desc    Update user profile
+// @route   PUT /api/users/profile
+// @access  Private
 const updateUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -104,7 +144,7 @@ const updateUserProfile = async (req, res) => {
         }
 
         // Update fields if provided
-        const { name, phone, location, region, zone, village, farmSize } = req.body;
+        const { name, phone, location, region, zone, village, farmSize, mainCrops } = req.body;
         
         if (name !== undefined) user.name = name;
         if (phone !== undefined) user.phone = phone;
@@ -114,6 +154,7 @@ const updateUserProfile = async (req, res) => {
         if (village !== undefined) user.village = village;
         if (farmSize !== undefined) user.farmSize = parseFloat(farmSize) || 0.0;
         if (mainCrops !== undefined) user.mainCrops = mainCrops;
+        
         const updatedUser = await user.save();
 
         res.json({
@@ -134,7 +175,7 @@ const updateUserProfile = async (req, res) => {
 
     } catch (error) {
         console.error('Profile update error:', error);
-          // Handle validation errors
+        
         if (error.name === 'ValidationError') {
             return res.status(400).json({ 
                 message: 'Validation error',
@@ -142,13 +183,14 @@ const updateUserProfile = async (req, res) => {
             });
         }
         
-        // Handle duplicate key errors
         if (error.code === 11000) {
             return res.status(400).json({ 
                 message: 'Email already exists' 
             });
         }
+        
         res.status(500).json({ message: 'Server error updating profile' });
     }
 };
-module.exports = { loginUser, registerUser, getUserProfile,updateUserProfile };
+
+module.exports = { loginUser, registerUser, getUserProfile, updateUserProfile };
