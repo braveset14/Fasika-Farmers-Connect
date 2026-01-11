@@ -2,7 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const User = require('./src/models/User'); // 
+const User = require('./src/models/User'); 
+const {Protect}=require('./src/middleware/authMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const jwt = require('jsonwebtoken');
@@ -238,25 +239,31 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // User profile
-app.get('/api/users/profile', (req, res) => {
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({
+app.get('/api/users/profile', protect, async (req, res) => {
+  try {
+    // User is already attached to req by the protect middleware
+    const user = req.user;
+    
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+        verified: user.verified,
+        createdAt: user.createdAt
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Profile fetch error:', error);
+    res.status(500).json({
       success: false,
-      message: 'Authentication required'
+      message: 'Server error fetching profile'
     });
   }
-  
-  res.json({
-    success: true,
-    user: {
-      id: 1,
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'farmer'
-    }
-  });
 });
 
 
