@@ -54,10 +54,10 @@ const userSchema = mongoose.Schema({
         type: Number,
         default: 0.0
     },
-    mainCrops: [{
+    mainCrops: {
         type: String,
         default: []
-    }],
+    },
     profileImage: { 
         type: String,
         default: '' 
