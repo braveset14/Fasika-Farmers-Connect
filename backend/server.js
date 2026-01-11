@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const User = require('./src/models/User'); 
-const {Protect}=require('./src/middleware/authMiddleware');
+const {protect}=require('./src/middleware/authMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const jwt = require('jsonwebtoken');
@@ -239,7 +239,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // User profile
-app.get('/api/users/profile', Protect, async (req, res) => {
+app.get('/api/users/profile', protect, async (req, res) => {
   try {
     // User is already attached to req by the protect middleware
     const user = req.user;
