@@ -239,7 +239,7 @@ app.post('/api/auth/register', async (req, res) => {
 });
 
 // User profile
-app.get('/api/users/profile', protect, async (req, res) => {
+app.get('/api/users/profile', Protect, async (req, res) => {
   try {
     // User is already attached to req by the protect middleware
     const user = req.user;
