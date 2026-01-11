@@ -17,6 +17,12 @@ const loginUser = async (req, res) => {
             email: user.email,
             role: user.role,
             status: user.status,
+            phone: user.phone,
+            location: user.location,
+            region: user.region,
+            zone: user.zone,
+            village: user.village,
+            farmSize: user.farmSize,
             token: generateToken(user._id)
         });
     } else {
@@ -81,7 +87,8 @@ const getUserProfile = async (req, res) => {
             region: user.region || '',
             zone: user.zone || '',
             village: user.village || '',
-            farmSize: user.farmSize || 0
+            farmSize: user.farmSize || 0,
+            mainCrops: user.mainCrops || []
         });
     } else {
         res.status(404).json({ message: 'User not found' });
@@ -105,8 +112,8 @@ const updateUserProfile = async (req, res) => {
         if (region !== undefined) user.region = region;
         if (zone !== undefined) user.zone = zone;
         if (village !== undefined) user.village = village;
-        if (farmSize !== undefined) user.farmSize = farmSize;
-
+        if (farmSize !== undefined) user.farmSize = parseFloat(farmSize) || 0.0;
+        if (mainCrops !== undefined) user.mainCrops = mainCrops;
         const updatedUser = await user.save();
 
         res.json({
@@ -121,11 +128,26 @@ const updateUserProfile = async (req, res) => {
             zone: updatedUser.zone,
             village: updatedUser.village,
             farmSize: updatedUser.farmSize,
+            mainCrops: updatedUser.mainCrops,
             message: 'Profile updated successfully'
         });
 
     } catch (error) {
         console.error('Profile update error:', error);
+          // Handle validation errors
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                message: 'Validation error',
+                error: error.message 
+            });
+        }
+        
+        // Handle duplicate key errors
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                message: 'Email already exists' 
+            });
+        }
         res.status(500).json({ message: 'Server error updating profile' });
     }
 };
