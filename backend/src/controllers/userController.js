@@ -77,11 +77,56 @@ const getUserProfile = async (req, res) => {
             role: user.role,
             status: user.status,
             phone: user.phone,
-            location: user.location
+            location: user.location,
+            region: user.region || '',
+            zone: user.zone || '',
+            village: user.village || '',
+            farmSize: user.farmSize || 0
         });
     } else {
         res.status(404).json({ message: 'User not found' });
     }
 };
 
-module.exports = { loginUser, registerUser, getUserProfile };
+const updateUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update fields if provided
+        const { name, phone, location, region, zone, village, farmSize } = req.body;
+        
+        if (name !== undefined) user.name = name;
+        if (phone !== undefined) user.phone = phone;
+        if (location !== undefined) user.location = location;
+        if (region !== undefined) user.region = region;
+        if (zone !== undefined) user.zone = zone;
+        if (village !== undefined) user.village = village;
+        if (farmSize !== undefined) user.farmSize = farmSize;
+
+        const updatedUser = await user.save();
+
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            role: updatedUser.role,
+            status: updatedUser.status,
+            phone: updatedUser.phone,
+            location: updatedUser.location,
+            region: updatedUser.region,
+            zone: updatedUser.zone,
+            village: updatedUser.village,
+            farmSize: updatedUser.farmSize,
+            message: 'Profile updated successfully'
+        });
+
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ message: 'Server error updating profile' });
+    }
+};
+module.exports = { loginUser, registerUser, getUserProfile,updateUserProfile };
