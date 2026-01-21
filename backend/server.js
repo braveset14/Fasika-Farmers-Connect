@@ -9,9 +9,12 @@ const app = express();
 /* ✅ REQUIRED FOR RENDER (SECURE COOKIES) */
 app.set('trust proxy', 1);
 
-// 1️⃣ CORS CONFIGURATION
+// 1️⃣ CORS CONFIGURATION - Updated origin only
 app.use(cors({
-  origin: 'https://fasika-frontend.onrender.com', 
+  origin: [
+    'https://fasika-frontend.onrender.com', 
+    'https://fasika-farmers-connect-5r2h.onrender.com'
+  ], 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -71,15 +74,11 @@ app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/farmers', adminFarmerRoutes);
 
 // --- MOUNTING ADMIN MARKETPLACE ---
-// This enables: /api/admin/marketplace/listings
-// Correctly handles the "Authority DROP" actions for Global/Filtered views
 app.use('/api/admin/marketplace', adminMarketplaceRoutes); 
 
 /* --- FARMER/PRODUCER SECTOR --- */
-// LAND DROP REGISTRY
 app.use('/api/farmer/farm/land', farmerFarmRoutes); 
 app.use('/api/farmer/farm', farmerFarmRoutes);
-
 app.use('/api/farmer/listings', farmerListingRoutes);
 app.use('/api/farmer/advisory', advisoryRoutes);
 app.use('/api/farmer/support', farmerSupportRoutes);
