@@ -66,6 +66,14 @@ function App() {
     setLoading(false);
   }, []);
 
+  // --- ADDED LOGOUT HANDLER ---
+  const handleLogout = () => {
+    localStorage.removeItem("role");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("isAuthenticated");
+    setRole(null); 
+  };
+
   if (loading) return <Spinner />;
 
   return (
@@ -85,7 +93,8 @@ function App() {
         <Route element={
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <div style={{ flex: 1 }}>
-              <ProtectedLayout role={role} />
+              {/* --- ADDED onLogout PROP --- */}
+              <ProtectedLayout role={role} onLogout={handleLogout} />
             </div>
             <Footer />
           </div>
