@@ -125,7 +125,7 @@ const FarmerProfile = () => {
             <div style={s.group}><label style={s.label}>Area (Ha)</label><input style={s.input} type="number" step="0.1" name="area_size" onChange={handleChange} required /></div>
           </div>
 
-          <div style={s.sectionTitle}><MdPets size={30}/> Livestock (Optional)</div>
+          <div style={s.sectionTitle}><MdPets size={30}/> Livestock Records</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
             <div style={s.group}><label style={s.label}>Tag Number</label><input style={s.input} name="tag_number" onChange={handleChange} /></div>
             <div style={s.group}><label style={s.label}>Species</label><input style={s.input} name="species" onChange={handleChange} /></div>
