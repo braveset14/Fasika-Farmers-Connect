@@ -1,6 +1,6 @@
 Fasika Farmer's connect
  Here is the live link to my project 
-------- https://fasika-farmers-connect.vercel.app/
+------- https://fasika-frontend.onrender.com
  
  Here is how you set up.
 1,Clone the repo: git clone <your-repo-link>
@@ -11,5 +11,5 @@ Fasika Farmer's connect
 
 4, On Bash run:
 
-VITE_API_BASE_URL=https://your-backend-link.com
+VITE_API_BASE_URL=https://fasika-yg5m.onrender.com
 5,Run local: npm run dev
