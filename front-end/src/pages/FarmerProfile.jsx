@@ -1,4 +1,4 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { MdCameraAlt, MdAgriculture, MdLocationOn, MdPets, MdPerson } from 'react-icons/md';
@@ -6,8 +6,9 @@ import { MdCameraAlt, MdAgriculture, MdLocationOn, MdPets, MdPerson } from 'reac
 const FarmerProfile = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    farm_name: '', farm_type: '', public_farmer_id: '',
-    plot_name: '', area_size: '', tag_number: '', species: ''
+    full_name: '', region: '', zone: '', woreda: '', kebele: '',
+    farm_name: '', farm_type: '', plot_name: '', area_size: '',
+    tag_number: '', species: ''
   });
 
   const [photoFile, setPhotoFile] = useState(null);
@@ -30,16 +31,22 @@ const FarmerProfile = () => {
     setLoading(true);
     const data = new FormData();
     if (photoFile) data.append('photo', photoFile);
+    
+    // Append all form fields to FormData
     Object.keys(formData).forEach(key => data.append(key, formData[key]));
 
     try {
-      await api.post('/farmers/profile', data, { headers: { 'Content-Type': 'multipart/form-data' } });
+      await api.post('/farmers/profile', data, { 
+        headers: { 'Content-Type': 'multipart/form-data' } 
+      });
       setStatus({ msg: 'Success! Farmer Profile Created', isError: false });
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => navigate('/dashboard'), 2000);
     } catch (err) {
       setStatus({ msg: 'Error: ' + (err.response?.data?.error || 'Server error'), isError: true });
-    } finally { setLoading(false); }
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const s = {
@@ -87,7 +94,7 @@ const FarmerProfile = () => {
     <div style={s.pageWrapper}>
       <div style={s.container}>
         <h2 style={s.title}>Farmer Onboarding</h2>
-        <p style={s.subtitle}>Complete your profile to access specialized farming tools</p>
+        <p style={s.subtitle}>Create your profile to access specialized farming tools</p>
         
         {status.msg && (
           <div style={{ backgroundColor: status.isError ? '#ffe5ec' : '#d8f3dc', color: status.isError ? '#d00000' : '#1b4332', padding: '20px', borderRadius: '12px', textAlign: 'center', marginBottom: '30px', fontWeight: '700', fontSize: '1.2rem' }}>
@@ -108,31 +115,40 @@ const FarmerProfile = () => {
             </label>
           </div>
 
-          <div style={s.sectionTitle}><MdAgriculture size={30}/> Farm Details</div>
+          <div style={s.sectionTitle}><MdPerson size={30}/> Personal Information</div>
+          <div style={s.group}>
+            <label style={s.label}>Full Name</label>
+            <input style={s.input} name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Enter full name" required />
+          </div>
+
+          <div style={s.sectionTitle}><MdLocationOn size={30}/> Location Details</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+            <div style={s.group}><label style={s.label}>Region</label><input style={s.input} name="region" value={formData.region} onChange={handleChange} /></div>
+            <div style={s.group}><label style={s.label}>Zone</label><input style={s.input} name="zone" value={formData.zone} onChange={handleChange} /></div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+            <div style={s.group}><label style={s.label}>Woreda</label><input style={s.input} name="woreda" value={formData.woreda} onChange={handleChange} /></div>
+            <div style={s.group}><label style={s.label}>Kebele</label><input style={s.input} name="kebele" value={formData.kebele} onChange={handleChange} /></div>
+          </div>
+
+          <div style={s.sectionTitle}><MdAgriculture size={30}/> Farm Assets</div>
           <div style={s.group}>
             <label style={s.label}>Farm Name</label>
-            <input style={s.input} name="farm_name" onChange={handleChange} placeholder="Green Valley Estate" required />
+            <input style={s.input} name="farm_name" value={formData.farm_name} onChange={handleChange} placeholder="Green Valley" required />
           </div>
-
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Farm Type</label><input style={s.input} name="farm_type" onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Public ID</label><input style={s.input} name="public_farmer_id" onChange={handleChange} /></div>
-          </div>
-
-          <div style={s.sectionTitle}><MdLocationOn size={30}/> Land Assets</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Plot Name</label><input style={s.input} name="plot_name" onChange={handleChange} required /></div>
-            <div style={s.group}><label style={s.label}>Area (Ha)</label><input style={s.input} type="number" step="0.1" name="area_size" onChange={handleChange} required /></div>
+            <div style={s.group}><label style={s.label}>Plot Name</label><input style={s.input} name="plot_name" value={formData.plot_name} onChange={handleChange} /></div>
+            <div style={s.group}><label style={s.label}>Area (Ha)</label><input style={s.input} type="number" step="0.1" name="area_size" value={formData.area_size} onChange={handleChange} /></div>
           </div>
 
           <div style={s.sectionTitle}><MdPets size={30}/> Livestock Records</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Tag Number</label><input style={s.input} name="tag_number" onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Species</label><input style={s.input} name="species" onChange={handleChange} /></div>
+            <div style={s.group}><label style={s.label}>Tag Number</label><input style={s.input} name="tag_number" value={formData.tag_number} onChange={handleChange} /></div>
+            <div style={s.group}><label style={s.label}>Species</label><input style={s.input} name="species" value={formData.species} onChange={handleChange} /></div>
           </div>
 
           <button type="submit" disabled={loading} style={{...s.button, opacity: loading ? 0.7 : 1}}>
-            {loading ? 'Creating...' : 'Complete Registration'}
+            {loading ? 'Creating...' : 'Initialize Farmer Registry'}
           </button>
         </form>
       </div>
