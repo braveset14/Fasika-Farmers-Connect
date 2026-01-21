@@ -1,154 +1,140 @@
 import React, { useState } from 'react';
-import api from '../api/axios';
-import { useNavigate } from 'react-router-dom';
-import { MdCameraAlt, MdAgriculture, MdLocationOn, MdPets, MdPerson } from 'react-icons/md';
+import api from '../../api/axios';
 
-const FarmerProfile = () => {
-  const navigate = useNavigate();
+const FarmerRegistrationForm = () => {
   const [formData, setFormData] = useState({
-    full_name: '', region: '', zone: '', woreda: '', kebele: '',
-    farm_name: '', farm_type: '', plot_name: '', area_size: '',
-    tag_number: '', species: ''
+    // 1. Users Table Info
+    full_name: '', phone: '', email: '', password: '',
+    region: '', zone: '', woreda: '', kebele: '',
+    // 2. Farmers Table Info
+    farm_name: 'My Farm', farm_type: '', public_farmer_id: '',
+    // 3. Land Plots Table Info
+    plot_name: '', area_size: '',
+    // 4. Crops Table Info
+    crop_name: '', planting_date: ''
   });
 
-  const [photoFile, setPhotoFile] = useState(null);
-  const [preview, setPreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ msg: '', isError: false });
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setPhotoFile(file);
-      setPreview(URL.createObjectURL(file));
-    }
+  // --- Inline Styles ---
+  const s = {
+    wrapper: { maxWidth: '850px', margin: '40px auto', padding: '20px', backgroundColor: '#f4f7f6', borderRadius: '15px' },
+    card: { backgroundColor: '#fff', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', fontFamily: 'Arial, sans-serif' },
+    header: { color: '#1b4332', textAlign: 'center', marginBottom: '30px' },
+    section: { marginBottom: '30px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '10px', backgroundColor: '#fafbfc' },
+    sectionTitle: { fontSize: '16px', fontWeight: 'bold', color: '#2d6a4f', marginBottom: '15px', borderBottom: '2px solid #d8f3dc', paddingBottom: '5px' },
+    grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' },
+    inputGroup: { display: 'flex', flexDirection: 'column' },
+    label: { fontSize: '13px', marginBottom: '5px', fontWeight: '600', color: '#4a5568' },
+    input: { padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e0', outline: 'none' },
+    button: { width: '100%', padding: '16px', backgroundColor: '#2d6a4f', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '20px' },
+    alert: (isErr) => ({ padding: '15px', borderRadius: '8px', marginBottom: '20px', textAlign: 'center', backgroundColor: isErr ? '#fff5f5' : '#f0fff4', color: isErr ? '#c53030' : '#276749', border: `1px solid ${isErr ? '#feb2b2' : '#9ae6b4'}` })
   };
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = new FormData();
-    if (photoFile) data.append('photo', photoFile);
-    
-    // Append all form fields to FormData
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
+    setStatus({ msg: '', isError: false });
 
     try {
-      await api.post('/farmers/profile', data, { 
-        headers: { 'Content-Type': 'multipart/form-data' } 
-      });
-      setStatus({ msg: 'Success! Farmer Profile Created', isError: false });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => navigate('/dashboard'), 2000);
+      // This sends all section data to your backend for a single atomic transaction
+      await api.post('/farmers/register-complete', formData);
+      setStatus({ msg: 'Success! Your account and farm registry are now synchronized.', isError: false });
     } catch (err) {
-      setStatus({ msg: 'Error: ' + (err.response?.data?.error || 'Server error'), isError: true });
-    } finally { 
-      setLoading(false); 
+      setStatus({ msg: 'Registration Failed: ' + (err.response?.data?.message || 'Server connection error'), isError: true });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const s = {
-    pageWrapper: {
-      minHeight: '100vh',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      backgroundColor: '#1b4332',
-      backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed',
-      backgroundRepeat: 'no-repeat',
-      margin: 0,
-      padding: 0,
-      boxSizing: 'border-box',
-      overflowX: 'hidden'
-    },
-    container: { 
-      maxWidth: '850px', 
-      width: '100%',
-      minHeight: '100vh', 
-      padding: 'clamp(25px, 5%, 60px)', 
-      backgroundColor: 'rgba(255, 255, 255, 0.96)', 
-      backdropFilter: 'blur(10px)',
-      borderRadius: '0', 
-      boxShadow: '0 0 50px rgba(0,0,0,0.5)',
-      boxSizing: 'border-box',
-      display: 'flex',
-      flexDirection: 'column'
-    },
-    title: { textAlign: 'center', color: '#1b4332', fontSize: '2.8rem', fontWeight: '900', marginBottom: '10px', marginTop: '40px' },
-    subtitle: { textAlign: 'center', color: '#40916c', marginBottom: '50px', fontSize: '1.3rem', fontWeight: '500' },
-    sectionTitle: { display: 'flex', alignItems: 'center', gap: '12px', color: '#2d6a4f', fontSize: '1.5rem', fontWeight: '800', marginTop: '40px', borderBottom: '2px solid #d8f3dc', paddingBottom: '10px' },
-    group: { marginBottom: '25px' },
-    label: { display: 'block', marginBottom: '12px', fontWeight: '700', color: '#1b4332', fontSize: '1.1rem' },
-    input: { width: '100%', padding: '16px 20px', borderRadius: '12px', border: '2px solid #d8f3dc', backgroundColor: '#f8fdf9', fontSize: '1.1rem', outline: 'none', boxSizing: 'border-box' },
-    button: { width: '100%', padding: '22px', backgroundColor: '#2d6a4f', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: '800', fontSize: '1.5rem', marginTop: '50px', marginBottom: '60px', boxShadow: '0 6px 20px rgba(45, 106, 79, 0.4)' },
-    photoUpload: { width: '160px', height: '160px', margin: '0 auto 40px', borderRadius: '50%', border: '5px solid #b7e4c7', overflow: 'hidden', cursor: 'pointer', backgroundColor: '#e9f5ee', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }
-  };
-
   return (
-    <div style={s.pageWrapper}>
-      <div style={s.container}>
-        <h2 style={s.title}>Farmer Onboarding</h2>
-        <p style={s.subtitle}>Create your profile to access specialized farming tools</p>
+    <div style={s.wrapper}>
+      <div style={s.card}>
+        <h1 style={s.header}>Farmer Ecosystem Onboarding</h1>
         
-        {status.msg && (
-          <div style={{ backgroundColor: status.isError ? '#ffe5ec' : '#d8f3dc', color: status.isError ? '#d00000' : '#1b4332', padding: '20px', borderRadius: '12px', textAlign: 'center', marginBottom: '30px', fontWeight: '700', fontSize: '1.2rem' }}>
-            {status.msg}
-          </div>
-        )}
-        
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-          <div style={{ textAlign: 'center' }}>
-            <label style={s.photoUpload}>
-              {preview ? <img src={preview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (
-                <div style={{ textAlign: 'center', color: '#74c69d' }}>
-                  <MdCameraAlt size={60} />
-                  <div style={{ fontSize: '0.9rem', fontWeight: '900' }}>PHOTO</div>
-                </div>
-              )}
-              <input type="file" onChange={handlePhotoChange} style={{ display: 'none' }} accept="image/*" />
-            </label>
+        {status.msg && <div style={s.alert(status.isError)}>{status.msg}</div>}
+
+        <form onSubmit={handleSubmit}>
+          
+          {/* SECTION 1: ACCOUNT (USERS TABLE) */}
+          <div style={s.section}>
+            <div style={s.sectionTitle}>1. Account & Security (Users Table)</div>
+            <div style={s.grid}>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Full Name</label>
+                <input style={s.input} name="full_name" required onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Phone Number</label>
+                <input style={s.input} name="phone" required onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Email Address</label>
+                <input style={s.input} type="email" name="email" onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Password</label>
+                <input style={s.input} type="password" name="password" required onChange={handleChange} />
+              </div>
+            </div>
           </div>
 
-          <div style={s.sectionTitle}><MdPerson size={30}/> Personal Information</div>
-          <div style={s.group}>
-            <label style={s.label}>Full Name</label>
-            <input style={s.input} name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Enter full name" required />
+          {/* SECTION 2: FARM REGISTRY (FARMERS TABLE) */}
+          <div style={s.section}>
+            <div style={s.sectionTitle}>2. Farm Registry Details (Farmers Table)</div>
+            <div style={s.grid}>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Farm Name</label>
+                <input style={s.input} name="farm_name" placeholder="My Farm" onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Farm Type</label>
+                <select style={s.input} name="farm_type" onChange={handleChange}>
+                  <option value="">Select Type</option>
+                  <option value="Crop">Crop Production</option>
+                  <option value="Livestock">Livestock</option>
+                  <option value="Mixed">Mixed Farming</option>
+                </select>
+              </div>
+              <div style={{...s.inputGroup, gridColumn: 'span 2'}}>
+                <label style={s.label}>Public Farmer ID (Unique Identifier)</label>
+                <input style={s.input} name="public_farmer_id" placeholder="e.g. FARM-1002" onChange={handleChange} />
+              </div>
+            </div>
           </div>
 
-          <div style={s.sectionTitle}><MdLocationOn size={30}/> Location Details</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Region</label><input style={s.input} name="region" value={formData.region} onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Zone</label><input style={s.input} name="zone" value={formData.zone} onChange={handleChange} /></div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Woreda</label><input style={s.input} name="woreda" value={formData.woreda} onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Kebele</label><input style={s.input} name="kebele" value={formData.kebele} onChange={handleChange} /></div>
-          </div>
-
-          <div style={s.sectionTitle}><MdAgriculture size={30}/> Farm Assets</div>
-          <div style={s.group}>
-            <label style={s.label}>Farm Name</label>
-            <input style={s.input} name="farm_name" value={formData.farm_name} onChange={handleChange} placeholder="Green Valley" required />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Plot Name</label><input style={s.input} name="plot_name" value={formData.plot_name} onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Area (Ha)</label><input style={s.input} type="number" step="0.1" name="area_size" value={formData.area_size} onChange={handleChange} /></div>
-          </div>
-
-          <div style={s.sectionTitle}><MdPets size={30}/> Livestock Records</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
-            <div style={s.group}><label style={s.label}>Tag Number</label><input style={s.input} name="tag_number" value={formData.tag_number} onChange={handleChange} /></div>
-            <div style={s.group}><label style={s.label}>Species</label><input style={s.input} name="species" value={formData.species} onChange={handleChange} /></div>
+          {/* SECTION 3: LAND & CROPS (LAND_PLOTS & CROPS TABLES) */}
+          <div style={s.section}>
+            <div style={s.sectionTitle}>3. Initial Land Plot & Crop</div>
+            <div style={s.grid}>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Initial Plot Name</label>
+                <input style={s.input} name="plot_name" placeholder="e.g. North Field" required onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Area Size (Ha)</label>
+                <input style={s.input} type="number" step="0.01" name="area_size" required onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Crop to Plant</label>
+                <input style={s.input} name="crop_name" placeholder="e.g. Maize" onChange={handleChange} />
+              </div>
+              <div style={s.inputGroup}>
+                <label style={s.label}>Planting Date</label>
+                <input style={s.input} type="date" name="planting_date" onChange={handleChange} />
+              </div>
+            </div>
           </div>
 
-          <button type="submit" disabled={loading} style={{...s.button, opacity: loading ? 0.7 : 1}}>
-            {loading ? 'Creating...' : 'Initialize Farmer Registry'}
+          <button 
+            type="submit" 
+            disabled={loading} 
+            style={{...s.button, opacity: loading ? 0.7 : 1}}
+          >
+            {loading ? 'Creating Multi-Table Records...' : 'Submit Full Registration'}
           </button>
         </form>
       </div>
@@ -156,4 +142,4 @@ const FarmerProfile = () => {
   );
 };
 
-export default FarmerProfile;
+export default FarmerRegistrationForm;
